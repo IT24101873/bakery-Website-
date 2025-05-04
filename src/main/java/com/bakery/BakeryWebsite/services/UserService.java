@@ -60,4 +60,17 @@ public class UserService {
         userRepository.findById(id); // Will throw if not found
         userRepository.deleteById(id);
     }
+
+    // Authenticate user
+    public User authenticateUser(String username, String password) {
+        try {
+            User user = userRepository.findByUsername(username);
+            if (user.getPassword().equals(password)) { // Plain text comparison
+                return user;
+            }
+            return null;
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 }
