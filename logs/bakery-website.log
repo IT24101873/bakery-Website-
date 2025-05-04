@@ -1,0 +1,13 @@
+2025-05-04T14:28:03.101+05:30  INFO 7372 --- [BakeryWebsite] [main] c.b.B.BakeryWebsiteApplication           : Starting BakeryWebsiteApplication using Java 22.0.2 with PID 7372 (C:\Users\User\Desktop\BakeryWebsite\target\classes started by User in C:\Users\User\Desktop\BakeryWebsite)
+2025-05-04T14:28:03.104+05:30 DEBUG 7372 --- [BakeryWebsite] [main] c.b.B.BakeryWebsiteApplication           : Running with Spring Boot v3.4.5, Spring v6.2.6
+2025-05-04T14:28:03.105+05:30  INFO 7372 --- [BakeryWebsite] [main] c.b.B.BakeryWebsiteApplication           : No active profile set, falling back to 1 default profile: "default"
+2025-05-04T14:28:04.038+05:30  INFO 7372 --- [BakeryWebsite] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-05-04T14:28:04.057+05:30  INFO 7372 --- [BakeryWebsite] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-05-04T14:28:04.058+05:30  INFO 7372 --- [BakeryWebsite] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+2025-05-04T14:28:04.106+05:30  INFO 7372 --- [BakeryWebsite] [main] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring embedded WebApplicationContext
+2025-05-04T14:28:04.107+05:30  INFO 7372 --- [BakeryWebsite] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 936 ms
+2025-05-04T14:28:04.504+05:30  INFO 7372 --- [BakeryWebsite] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/api'
+2025-05-04T14:28:04.512+05:30  INFO 7372 --- [BakeryWebsite] [main] c.b.B.BakeryWebsiteApplication           : Started BakeryWebsiteApplication in 2.008 seconds (process running for 2.75)
+2025-05-04T14:28:25.338+05:30  INFO 7372 --- [BakeryWebsite] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/api]    : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-05-04T14:28:25.339+05:30  INFO 7372 --- [BakeryWebsite] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-05-04T14:28:25.341+05:30  INFO 7372 --- [BakeryWebsite] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
