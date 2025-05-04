@@ -1,88 +1,3 @@
-<!--<!DOCTYPE html>-->
-<!--<html lang="en">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--    <title>Users - BakeryWebsite</title>-->
-<!--    <script src="https://cdn.tailwindcss.com"></script>-->
-<!--</head>-->
-<!--<body class="bg-gray-100 font-sans">-->
-<!--&lt;!&ndash; Header &ndash;&gt;-->
-<!--<header class="bg-blue-600 text-white p-4">-->
-<!--    <div class="container mx-auto flex justify-between items-center">-->
-<!--        <h1 class="text-2xl font-bold">BakeryWebsite</h1>-->
-<!--        <nav>-->
-<!--            <a href="index.html" class="px-2 hover:underline">Home</a>-->
-<!--            <a href="users.html" class="px-2 hover:underline">Users</a>-->
-<!--            <a href="register.html" class="px-2 hover:underline">Register</a>-->
-<!--            <a href="login.html" class="px-2 hover:underline">Login</a>-->
-<!--            <a href="#" id="logout" class="px-2 hover:underline">Logout</a>-->
-<!--        </nav>-->
-<!--    </div>-->
-<!--</header>-->
-
-<!--&lt;!&ndash; Main Content &ndash;&gt;-->
-<!--<main class="container mx-auto p-4">-->
-<!--    <h2 class="text-3xl font-bold mb-4">Users</h2>-->
-<!--    <p class="mb-4">List of all registered users.</p>-->
-<!--    <table class="w-full bg-white shadow-md rounded">-->
-<!--        <thead>-->
-<!--        <tr class="bg-gray-200">-->
-<!--            <th class="p-2 text-left">ID</th>-->
-<!--            <th class="p-2 text-left">Username</th>-->
-<!--            <th class="p-2 text-left">Role</th>-->
-<!--        </tr>-->
-<!--        </thead>-->
-<!--        <tbody id="userTable">-->
-<!--        &lt;!&ndash; Users will be populated here &ndash;&gt;-->
-<!--        </tbody>-->
-<!--    </table>-->
-<!--</main>-->
-
-<!--&lt;!&ndash; Footer &ndash;&gt;-->
-<!--<footer class="bg-blue-600 text-white p-4 mt-8">-->
-<!--    <div class="container mx-auto text-center">-->
-<!--        <p>Contact: info@bakerywebsite.com | © 2025 BakeryWebsite</p>-->
-<!--    </div>-->
-<!--</footer>-->
-
-<!--<script>-->
-<!--    // Check if user is logged in and has admin role-->
-<!--    const user = localStorage.getItem('user');-->
-<!--    if (!user) {-->
-<!--        window.location.href = 'login.html';-->
-<!--    } else {-->
-<!--        const userObj = JSON.parse(user);-->
-<!--        if (userObj.role !== 'ADMIN') {-->
-<!--            alert('Access denied: Admins only');-->
-<!--            window.location.href = 'index.html';-->
-<!--        }-->
-<!--    }-->
-
-<!--    // Fetch and display users-->
-<!--    fetch('http://localhost:8080/api/users')-->
-<!--        .then(response => response.json())-->
-<!--        .then(users => {-->
-<!--            const userTable = document.getElementById('userTable');-->
-<!--            userTable.innerHTML = users.map(user => `-->
-<!--                    <tr>-->
-<!--                        <td class="p-2">${user.id}</td>-->
-<!--                        <td class="p-2">${user.username}</td>-->
-<!--                        <td class="p-2">${user.role}</td>-->
-<!--                    </tr>-->
-<!--                `).join('');-->
-<!--        })-->
-<!--        .catch(error => console.error('Error fetching users:', error));-->
-
-<!--    // Logout-->
-<!--    document.getElementById('logout').addEventListener('click', () => {-->
-<!--        localStorage.removeItem('user');-->
-<!--        window.location.href = 'login.html';-->
-<!--    });-->
-<!--</script>-->
-<!--</body>-->
-<!--</html>-->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -93,15 +8,14 @@
 </head>
 <body class="bg-gray-100 font-sans">
 <!-- Header -->
-<header class="bg-blue-600 text-white p-4">
+<header class="bg-stone-500 text-white p-4">
     <div class="container mx-auto flex justify-between items-center">
         <h1 class="text-2xl font-bold">BakeryWebsite</h1>
         <nav id="navLinks">
             <a href="index.html" class="px-2 hover:underline">Home</a>
-            <a href="users.html" class="px-2 hover:underline">Users</a>
             <a href="register.html" class="px-2 hover:underline">Register</a>
             <a href="login.html" class="px-2 hover:underline">Login</a>
-            <a href="#" id="logout" class="px-2 hover:underline">Logout</a>
+            <a href="#" id="logout" class="px-2 hover:underline hidden">Logout</a>
         </nav>
     </div>
 </header>
@@ -126,7 +40,7 @@
 </main>
 
 <!-- Footer -->
-<footer class="bg-blue-600 text-white p-4 mt-8">
+<footer class="bg-stone-500 text-white p-4">
     <div class="container mx-auto text-center">
         <p>Contact: info@bakerywebsite.com | © 2025 BakeryWebsite</p>
     </div>
@@ -135,6 +49,9 @@
 <script>
     // Check if user is logged in and has admin role
     const user = localStorage.getItem('user');
+    const navLinks = document.getElementById('navLinks');
+    const logoutLink = document.getElementById('logout');
+
     if (!user) {
         window.location.href = 'login.html';
     } else {
@@ -142,6 +59,21 @@
         if (userObj.role !== 'ADMIN') {
             alert('Access denied: Admins only');
             window.location.href = 'index.html';
+        } else {
+            // Show logout link and Users link for admins
+            logoutLink.classList.remove('hidden');
+            // Hide login and register links
+            Array.from(navLinks.children).forEach(link => {
+                if (link.textContent === 'Login' || link.textContent === 'Register') {
+                    link.classList.add('hidden');
+                }
+            });
+            // Add Users link
+            const usersLink = document.createElement('a');
+            usersLink.href = 'users.html';
+            usersLink.className = 'px-2 hover:underline';
+            usersLink.textContent = 'Users';
+            navLinks.insertBefore(usersLink, logoutLink);
         }
     }
 
