@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin(origins = "http://127.0.0.1:5500") // Adjust for your front-end URL
 public class UserController {
 
     private final UserService userService;
@@ -50,6 +51,15 @@ public class UserController {
     public String deleteUser(@PathVariable int userId) {
         userService.deleteUser(userId);
         return "User with ID " + userId + " deleted successfully";
+    }
+    // Login user (simplified)
+    @PostMapping("/login")
+    public User loginUser(@RequestBody User user) {
+        User authenticatedUser = userService.authenticateUser(user.getUsername(), user.getPassword());
+        if (authenticatedUser == null) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
+        return authenticatedUser;
     }
 }
 

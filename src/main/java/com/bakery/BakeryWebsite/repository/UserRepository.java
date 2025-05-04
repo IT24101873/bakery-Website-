@@ -84,4 +84,5 @@ public class UserRepository {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("User not found with username: " + username));
     }
+
 }
