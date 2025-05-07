@@ -1,0 +1,261 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Bakery Bliss - Manage Users</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f8f1eb;
+        }
+        .btn-pink {
+            background-color: #f9c1c6;
+            color: #5c4033;
+        }
+        .btn-pink:hover {
+            background-color: #f4a8ae;
+        }
+        .btn-red {
+            background-color: #ef4444;
+            color: white;
+        }
+        .btn-red:hover {
+            background-color: #dc2626;
+        }
+        .btn-green {
+            background-color: #34d399;
+            color: white;
+        }
+        .btn-green:hover {
+            background-color: #22c55e;
+        }
+        .btn-gray {
+            background-color: #d1d5db;
+            color: #374151;
+        }
+        .btn-gray:hover {
+            background-color: #9ca3af;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+<div class="bg-white p-4 shadow">
+    <div class="container mx-auto flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-[#5c4033]">Manage Users</h1>
+        <nav>
+            <ul id="nav-links" class="flex space-x-4"></ul>
+        </nav>
+    </div>
+</div>
+
+<div class="container mx-auto mt-8">
+    <h2 class="text-xl font-bold text-[#5c4033] mb-4">All Users</h2>
+    <table class="w-full border-collapse">
+        <thead>
+        <tr class="bg-[#f9c1c6]">
+            <th class="p-2 text-left text-[#5c4033]">ID</th>
+            <th class="p-2 text-left text-[#5c4033]">Username</th>
+            <th class="p-2 text-left text-[#5c4033]">Role</th>
+            <th class="p-2 text-left text-[#5c4033]">Actions</th>
+        </tr>
+        </thead>
+        <tbody id="user-list"></tbody>
+    </table>
+    <a href="index.html" class="block mt-4 text-[#8b5e3c] hover:underline">Back to Home</a>
+
+    <!-- Search User by ID -->
+    <div class="mt-8">
+        <h3 class="text-lg font-semibold text-[#5c4033] mb-2">Retrieve User by ID</h3>
+        <div class="flex space-x-2">
+            <input type="number" id="userIdInput" placeholder="Enter User ID"
+                   class="p-2 border rounded w-1/3"/>
+            <button onclick="getUserById()" class="btn-pink px-4 py-2 rounded">Search</button>
+        </div>
+        <div id="userDetails" class="mt-4 text-[#5c4033]"></div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = 'http://localhost:8080/api';
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+
+    // Redirect non-admins
+    if (!currentUser || currentUser.role !== 'ADMIN') {
+        alert('Access denied. Admins only.');
+        window.location.href = 'index.html';
+    }
+
+    // Populate navigation
+    const navLinks = document.getElementById('nav-links');
+    navLinks.innerHTML = `
+      <li><a href="index.html" class="text-[#5c4033] hover:underline">Home</a></li>
+      <li><a href="products.html" class="text-[#5c4033] hover:underline">Products</a></li>
+      <li><a href="profile.html" class="text-[#5c4033] hover:underline">Profile</a></li>
+      <li><a href="admin-users.html" class="text-[#5c4033] hover:underline">Admin</a></li>
+      <li><a href="#" id="logout" class="text-[#5c4033] hover:underline">Logout</a></li>
+    `;
+    document.getElementById('logout').addEventListener('click', () => {
+        sessionStorage.removeItem('currentUser');
+        window.location.href = 'login.html';
+    });
+
+    // Fetch and display users
+    async function loadUsers() {
+        try {
+            const response = await fetch(`${API_BASE}/users`, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to fetch users: ${response.status} ${errorText}`);
+            }
+            const users = await response.json();
+            const userList = document.getElementById('user-list');
+            userList.innerHTML = '';
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.setAttribute('data-id', user.id);
+                row.innerHTML = `
+            <td class="p-2 border">${user.id}</td>
+            <td class="p-2 border username-cell" data-username="${user.username}">${user.username}</td>
+            <td class="p-2 border role-cell" data-role="${user.role}">${user.role}</td>
+            <td class="p-2 border">
+              <button onclick="toggleEdit(${user.id}, this)" class="btn-pink px-2 py-1 rounded edit-btn">Edit</button>
+              <button onclick="deleteUser(${user.id})" class="btn-red px-2 py-1 rounded">Delete</button>
+            </td>
+          `;
+                userList.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Failed to load users: ' + error.message);
+        }
+    }
+
+    function toggleEdit(userId, button) {
+        const row = button.closest('tr');
+        const usernameCell = row.querySelector('.username-cell');
+        const roleCell = row.querySelector('.role-cell');
+        const isEditing = button.textContent === 'Edit';
+
+        if (isEditing) {
+            const originalUsername = usernameCell.getAttribute('data-username');
+            const originalRole = roleCell.getAttribute('data-role');
+            usernameCell.innerHTML = `<input type="text" value="${originalUsername}" class="w-full p-1 border rounded">`;
+            roleCell.innerHTML = `
+          <select class="w-full p-1 border rounded">
+            <option value="ADMIN" ${originalRole === 'ADMIN' ? 'selected' : ''}>ADMIN</option>
+<option value="CUSTOMER" ${originalRole === 'CUSTOMER' ? 'selected' : ''}>CUSTOMER</option>          </select>
+        `;
+            button.textContent = 'Save';
+            button.classList.remove('btn-pink');
+            button.classList.add('btn-green');
+
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.classList.add('btn-gray', 'px-2', 'py-1', 'rounded', 'ml-2');
+            cancelButton.onclick = () => cancelEdit(userId, originalUsername, originalRole);
+            button.parentElement.appendChild(cancelButton);
+        } else {
+            const newUsername = usernameCell.querySelector('input').value;
+            const newRole = roleCell.querySelector('select').value;
+            if (!newUsername) {
+                alert('Username cannot be empty.');
+                return;
+            }
+            saveUser(userId, newUsername, newRole);
+        }
+    }
+
+    function cancelEdit(userId, originalUsername, originalRole) {
+        const row = document.querySelector(`tr[data-id="${userId}"]`);
+        if (!row) return;
+        const usernameCell = row.querySelector('.username-cell');
+        const roleCell = row.querySelector('.role-cell');
+        const buttonCell = row.querySelector('td:last-child');
+        usernameCell.innerHTML = originalUsername;
+        roleCell.innerHTML = originalRole;
+        const editButton = buttonCell.querySelector('.edit-btn');
+        editButton.textContent = 'Edit';
+        editButton.classList.remove('btn-green');
+        editButton.classList.add('btn-pink');
+        const cancelButton = buttonCell.querySelector('.btn-gray');
+        if (cancelButton) cancelButton.remove();
+    }
+
+    async function saveUser(userId, username, role) {
+        try {
+            const response = await fetch(`${API_BASE}/users/${userId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password: null, role })
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Update failed: ${response.status} ${errorText}`);
+            }
+            alert('User updated successfully.');
+            loadUsers();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Update failed: ' + error.message);
+            loadUsers();
+        }
+    }
+
+    async function deleteUser(userId) {
+        if (!confirm('Are you sure you want to delete this user?')) return;
+        try {
+            const response = await fetch(`${API_BASE}/users/${userId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Deletion failed: ${response.status} ${errorText}`);
+            }
+            alert('User deleted successfully.');
+            loadUsers();
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Deletion failed: ' + error.message);
+        }
+    }
+
+    async function getUserById() {
+        const id = document.getElementById('userIdInput').value;
+        const display = document.getElementById('userDetails');
+        display.innerHTML = '';
+        if (!id) {
+            alert('Please enter a user ID.');
+            return;
+        }
+        try {
+            const response = await fetch(`${API_BASE}/users/${id}`, {
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`User not found: ${response.status} ${errorText}`);
+            }
+            const user = await response.json();
+            display.innerHTML = `
+          <p><strong>ID:</strong> ${user.id}</p>
+          <p><strong>Username:</strong> ${user.username}</p>
+          <p><strong>Role:</strong> ${user.role}</p>
+        `;
+        } catch (error) {
+            console.error('Error:', error);
+            display.innerHTML = `<p class="text-red-600">Error: ${error.message}</p>`;
+        }
+    }
+
+    // Load all users when page loads
+    loadUsers();
+</script>
+</body>
+</html>
+
+

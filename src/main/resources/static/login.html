@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bakery Bliss - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f8f1eb;
+        }
+        .btn-pink {
+            background-color: #f9c1c6;
+            color: #5c4033;
+        }
+        .btn-pink:hover {
+            background-color: #f4a8ae;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+<div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h2 class="text-2xl font-bold text-[#5c4033] mb-6">Login</h2>
+    <form id="login-form">
+        <div class="mb-4">
+            <label for="username" class="block text-[#5c4033]">Username</label>
+            <input type="text" id="username" class="w-full p-2 border rounded" required>
+        </div>
+        <div class="mb-4">
+            <label for="password" class="block text-[#5c4033]">Password</label>
+            <input type="password" id="password" class="w-full p-2 border rounded" required>
+        </div>
+        <button type="submit" class="btn-pink w-full p-2 rounded">Login</button>
+    </form>
+    <p class="mt-4 text-center">
+        Don't have an account? <a href="register.html" class="text-[#8b5e3c] hover:underline">Register</a>
+    </p>
+    <a href="index.html" class="block text-center mt-2 text-[#8b5e3c] hover:underline">Back to Home</a>
+</div>
+<script>
+    const API_BASE = 'http://localhost:8080/api';
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        try {
+            const response = await fetch(`${API_BASE}/users/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Login failed: ${response.status} ${errorText}`);
+            }
+            const user = await response.json();
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
+            alert('Login successful!');
+            window.location.href = 'index.html';
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Login failed: ' + error.message);
+        }
+    });
+</script>
+</body>
+</html>
