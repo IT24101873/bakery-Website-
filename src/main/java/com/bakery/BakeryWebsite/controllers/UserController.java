@@ -1,8 +1,6 @@
 package com.bakery.BakeryWebsite.controllers;
 
 
-
-
 import com.bakery.BakeryWebsite.models.User;
 import com.bakery.BakeryWebsite.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +10,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://127.0.0.1:5500") // Adjust for your front-end URL
+//@CrossOrigin(origins = "http://127.0.0.1:5500")
+//@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "*")
+
 public class UserController {
 
     private final UserService userService;
@@ -22,37 +23,36 @@ public class UserController {
         this.userService = userService;
     }
 
-    // Get all users
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
-    // Get user by ID
+
     @GetMapping("/{userId}")
     public User getUserById(@PathVariable long userId) {
         return userService.getUserById(userId);
     }
 
-
-    // Create a new user
     @PostMapping
     public User saveUser(@RequestBody User user) {
         return userService.createUser(user.getUsername(), user.getPassword(), user.getRole());
     }
 
-    // Update user
     @PutMapping("/{userId}")
-    public User updateUser(@RequestBody User user, @PathVariable int userId) {
-        return userService.updateUser(userId, user.getUsername(), user.getPassword(), user.getRole());
+    public User updateUser(@RequestBody User user, @PathVariable long userId) {
+        String password = user.getPassword();
+        if (password != null && password.isBlank()) {
+            password = null; // Don't update password if blank
+        }
+        return userService.updateUser(userId, user.getUsername(), password, user.getRole());
     }
 
-    // Delete user
     @DeleteMapping("/{userId}")
-    public String deleteUser(@PathVariable int userId) {
+    public String deleteUser(@PathVariable long userId) {
         userService.deleteUser(userId);
         return "User with ID " + userId + " deleted successfully";
     }
-    // Login user (simplified)
+
     @PostMapping("/login")
     public User loginUser(@RequestBody User user) {
         User authenticatedUser = userService.authenticateUser(user.getUsername(), user.getPassword());
@@ -62,10 +62,3 @@ public class UserController {
         return authenticatedUser;
     }
 }
-
-
-
-
-
-
-
