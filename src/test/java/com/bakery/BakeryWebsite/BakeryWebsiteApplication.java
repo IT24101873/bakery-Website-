@@ -5,9 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class BakeryWebsiteApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(BakeryWebsiteApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(BakeryWebsiteApplication.class, args);
+    }
 }

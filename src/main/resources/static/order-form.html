@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bakery Order Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-image: url('https://images.unsplash.com/photo-1600585154347-be6161a56a0c');
+            background-size: cover;
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+<div class="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h1 class="text-3xl font-bold text-center text-blue-600 mb-6"> Place Your Bakery Order </h1>
+    <form id="orderForm" class="space-y-4">
+        <div>
+            <label for="customerName" class="block text-sm font-medium text-gray-700">Customer Name</label>
+            <input type="text" id="customerName" name="customerName" required
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div>
+            <label for="item" class="block text-sm font-medium text-gray-700">Item</label>
+            <input type="text" id="item" name="item" required
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div>
+            <label for="pickupTime" class="block text-sm font-medium text-gray-700">Pickup Time</label>
+            <input type="datetime-local" id="pickupTime" name="pickupTime" required
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div>
+            <label for="cakeDesign" class="block text-sm font-medium text-gray-700">Cake Design (Optional)</label>
+            <input type="text" id="cakeDesign" name="cakeDesign"
+                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <button type="submit"
+                class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+            Place Order
+        </button>
+    </form>
+    <a href="/order-list.html" class="block text-center mt-4 text-blue-600 hover:underline">View All Orders</a>
+</div>
+<script>
+    document.getElementById('orderForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const response = await fetch('/add-order', {
+            method: 'POST',
+            body: formData
+        });
+        if (response.ok) {
+            window.location.href = '/order-list.html';
+        } else {
+            alert('Failed to place order. Please try again.');
+        }
+    });
+</script>
+</body>
+</html>

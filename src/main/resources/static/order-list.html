@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bakery Orders</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-image: url('https://images.unsplash.com/photo-1600585154347-be6161a56a0c');
+      background-size: cover;
+      background-attachment: fixed;
+    }
+  </style>
+</head>
+<body class="min-h-screen p-6">
+<div class="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
+  <h1 class="text-3xl font-bold text-center text-blue-600 mb-6"> Bakery Orders </h1>
+  <table class="w-full text-left border-collapse">
+    <thead>
+    <tr class="bg-blue-100">
+      <th class="p-3">Order ID</th>
+      <th class="p-3">Customer</th>
+      <th class="p-3">Item</th>
+      <th class="p-3">Pickup Time</th>
+      <th class="p-3">Status</th>
+      <th class="p-3">Details</th>
+    </tr>
+    </thead>
+    <tbody id="orderTableBody">
+    <!-- Orders will be populated dynamically -->
+    </tbody>
+  </table>
+  <div class="flex justify-between mt-6">
+    <a href="/order-form.html" class="text-blue-600 hover:underline">Place a New Order</a>
+    <a href="/admin-dashboard.html" class="text-blue-600 hover:underline">Go to Admin Dashboard</a>
+  </div>
+</div>
+<script>
+  async function loadOrders() {
+    const response = await fetch('/api/orders');
+    const orders = await response.json();
+    const tbody = document.getElementById('orderTableBody');
+    tbody.innerHTML = ''; // Clear any existing rows
+    if (orders.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-gray-600">No orders yet. Place an order to get started!</td></tr>';
+      return;
+    }
+    orders.forEach(order => {
+      const row = document.createElement('tr');
+      row.className = 'border-b hover:bg-blue-50';
+      row.innerHTML = `
+                    <td class="p-3">${order.orderId}</td>
+                    <td class="p-3">${order.customerName}</td>
+                    <td class="p-3">${order.item}</td>
+                    <td class="p-3">${order.pickupTime}</td>
+                    <td class="p-3">${order.status}</td>
+                    <td class="p-3">${order.orderDetails}</td>
+                `;
+      tbody.appendChild(row);
+    });
+  }
+
+  // Load orders when the page loads
+  window.onload = loadOrders;
+</script>
+</body>
+</html>
