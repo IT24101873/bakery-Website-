@@ -1,0 +1,29 @@
+[ {
+  "id" : 1,
+  "username" : "john_doe",
+  "email" : null,
+  "password" : "12345",
+  "role" : "CUSTOMER",
+  "userType" : "Customer"
+}, {
+  "id" : 2,
+  "username" : "Tom Castry",
+  "email" : "Tom Castry",
+  "password" : "tom1234",
+  "role" : "CUSTOMER",
+  "userType" : "Customer"
+}, {
+  "id" : 3,
+  "username" : "Cathrine McBrone",
+  "email" : "Cathrine McBrone@gmail.com",
+  "password" : "CathMc0",
+  "role" : "CUSTOMER",
+  "userType" : "Customer"
+}, {
+  "id" : 4,
+  "username" : "Karl Sam Danphy",
+  "email" : "Karl Danphy@gmail.com",
+  "password" : "KarlD1",
+  "role" : "CUSTOMER",
+  "userType" : "Customer"
+} ]
