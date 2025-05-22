@@ -1,7 +1,6 @@
 package com.bakery.BakeryWebsite.controllers;
 
 import com.bakery.BakeryWebsite.models.Order;
-import com.bakery.BakeryWebsite.models.CustomCakeOrder;
 import com.bakery.BakeryWebsite.services.OrderService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,20 +28,14 @@ public class OrderController {
     @PostMapping("/add-order")
     public String addOrder(
             @RequestParam String customerName,
-            @RequestParam String item,
+            @RequestParam String cakeType,
             @RequestParam String pickupTime,
-            @RequestParam(required = false) String cakeDesign) throws IOException {
+            @RequestParam String orderType) throws IOException {
         String orderId = UUID.randomUUID().toString();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         LocalDateTime parsedPickupTime = LocalDateTime.parse(pickupTime, formatter);
 
-        Order order;
-        if (cakeDesign != null && !cakeDesign.isEmpty()) {
-            order = new CustomCakeOrder(orderId, customerName, item, parsedPickupTime, cakeDesign);
-        } else {
-            order = new Order(orderId, customerName, item, parsedPickupTime);
-        }
-
+        Order order = new Order(orderId, customerName, cakeType, parsedPickupTime, Order.OrderType.valueOf(orderType));
         orderService.addOrder(order);
         return "redirect:/order-list.html";
     }
