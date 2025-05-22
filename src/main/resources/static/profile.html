@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile - Golden Dust</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;1,700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="header">
+    <div class="container">
+        <div class="navbar">
+            <div class="logo">
+                <img src="images/images/icon.png" alt="Bakery logo">
+            </div>
+            <nav class="nav-links">
+                <ul id="nav-links">
+                    <!-- Dynamically populated based on login status -->
+                </ul>
+            </nav>
+            <img src="images/images/cartIcon.png" class="cart" width="30px" height="30px">
+        </div>
+    </div>
+</div>
+
+<div class="small-container">
+    <div class="row">
+        <div class="col-2" style="width: 100%;">
+            <h2 class="title">User Profile</h2>
+            <div id="user-details" style="margin-bottom: 20px;">
+                <p><strong>Username:</strong> <span id="username"></span></p>
+                <p><strong>Email:</strong> <span id="email"></span></p>
+            </div>
+            <form id="update-form" style="display: flex; flex-direction: column; gap: 15px; max-width: 400px; margin: 0 auto;">
+                <input type="text" id="new-username" placeholder="New Username" style="padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                <input type="email" id="new-email" placeholder="New Email" style="padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                <input type="password" id="new-password" placeholder="New Password" style="padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                <button type="submit" class="btn">Update Profile</button>
+            </form>
+            <p id="update-message" style="color: green; text-align: center; margin-top: 10px;"></p>
+            <p id="error-message" style="color: red; text-align: center; margin-top: 10px;"></p>
+            <button id="delete-account" class="btn" style="background-color: #ff4444; margin-top: 20px;">Delete Account</button>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="footer-col-1">
+                <h3>Visit Our Bakery</h3>
+                <p>Explore our delicious range of fresh baked goods, now available at your fingertips.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = '/api';
+
+    // Dynamically update navbar based on login status
+    const navLinks = document.getElementById('nav-links');
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+    if (currentUser) {
+        navLinks.innerHTML = `
+            <li><a href="index.html">Home</a></li>
+            <li><a href="products.html">Products</a></li>
+            <li><a href="profile.html">Profile</a></li>
+            ${currentUser.role === 'ADMIN' ? '<li><a href="user-admins.html">Users</a></li>' : ''}
+            <li><a href="#" id="logout">Logout</a></li>
+        `;
+        document.getElementById('logout').addEventListener('click', () => {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        });
+    } else {
+        navLinks.innerHTML = `
+            <li><a href="index.html">Home</a></li>
+            <li><a href="products.html">Products</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="admin-login.html">Admin Login</a></li>
+        `;
+        window.location.href = 'index.html'; // Redirect to index if not logged in
+    }
+
+    // Display user details on page load
+    function displayUserDetails() {
+        if (currentUser) {
+            document.getElementById('username').textContent = currentUser.username;
+            document.getElementById('email').textContent = currentUser.email;
+        } else {
+            window.location.href = 'index.html';
+        }
+    }
+
+    // Update profile form submission
+    document.getElementById('update-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const newUsername = document.getElementById('new-username').value;
+        const newEmail = document.getElementById('new-email').value;
+        const newPassword = document.getElementById('new-password').value;
+        const errorMessage = document.getElementById('error-message');
+        const updateMessage = document.getElementById('update-message');
+
+        if (!currentUser) {
+            errorMessage.textContent = 'Please log in to update your profile.';
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE}/users/${currentUser.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: newUsername || currentUser.username,
+                    email: newEmail || currentUser.email,
+                    password: newPassword || currentUser.password
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Update failed. Please try again.');
+            }
+
+            const updatedUser = await response.json();
+            sessionStorage.setItem('currentUser', JSON.stringify(updatedUser));
+            displayUserDetails();
+            updateMessage.textContent = 'Profile updated successfully!';
+            errorMessage.textContent = '';
+            document.getElementById('update-form').reset();
+            setTimeout(() => updateMessage.textContent = '', 3000); // Clear message after 3 seconds
+        } catch (error) {
+            errorMessage.textContent = error.message;
+            updateMessage.textContent = '';
+        }
+    });
+
+    // Delete account
+    document.getElementById('delete-account').addEventListener('click', async () => {
+        if (!currentUser) {
+            document.getElementById('error-message').textContent = 'Please log in to delete your account.';
+            return;
+        }
+
+        if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+            try {
+                const response = await fetch(`${API_BASE}/users/${currentUser.id}`, {
+                    method: 'DELETE',
+                });
+
+                if (!response.ok) {
+                    throw new Error('Deletion failed. Please try again.');
+                }
+
+                sessionStorage.removeItem('currentUser');
+                window.location.href = 'index.html';
+            } catch (error) {
+                document.getElementById('error-message').textContent = error.message;
+            }
+        }
+    });
+
+    // Load user details when page loads
+    window.onload = displayUserDetails;
+</script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - Golden Dust</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;1,700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="header">
+    <div class="container">
+        <div class="navbar">
+            <div class="logo">
+                <img src="images/images/icon.png" alt="Bakery logo">
+            </div>
+            <nav class="nav-links">
+                <ul id="nav-links">
+                    <!-- Dynamically populated based on login status -->
+                </ul>
+            </nav>
+            <img src="images/images/cartIcon.png" class="cart" width="30px" height="30px">
+        </div>
+    </div>
+</div>
+
+<div class="small-container">
+    <div class="row">
+        <div class="col-2" style="width: 100%;">
+            <h2 class="title">Register</h2>
+            <form id="register-form" style="display: flex; flex-direction: column; gap: 15px; max-width: 400px; margin: 0 auto;">
+                <input type="text" id="username" placeholder="Username" required style="padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                <input type="email" id="email" placeholder="Email" required style="padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                <input type="password" id="password" placeholder="Password" required style="padding: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                <button type="submit" class="btn">Register</button>
+            </form>
+            <p id="error-message" style="color: red; text-align: center; margin-top: 10px;"></p>
+            <p style="text-align: center; margin-top: 20px;">Already have an account? <a href="login.html">Login here</a></p>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="footer-col-1">
+                <h3>Visit Our Bakery</h3>
+                <p>Explore our delicious range of fresh baked goods, now available at your fingertips.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = '/api';
+
+    // Dynamically update navbar based on login status
+    const navLinks = document.getElementById('nav-links');
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+    if (currentUser) {
+        navLinks.innerHTML = `
+            <li><a href="index.html">Home</a></li>
+            <li><a href="products.html">Products</a></li>
+            <li><a href="profile.html">Profile</a></li>
+            ${currentUser.role === 'ADMIN' ? '<li><a href="user-admins.html">Users</a></li>' : ''}
+            <li><a href="#" id="logout">Logout</a></li>
+        `;
+        document.getElementById('logout').addEventListener('click', () => {
+            sessionStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        });
+    } else {
+        navLinks.innerHTML = `
+            <li><a href="index.html">Home</a></li>
+            <li><a href="products.html">Products</a></li>
+            <li><a href="register.html">Register</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="admin-login.html">Admin Login</a></li>
+        `;
+    }
+
+    // Register form submission
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const errorMessage = document.getElementById('error-message');
+
+        try {
+            const response = await fetch(`${API_BASE}/users`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password, role: 'CUSTOMER' }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Registration failed. Please try again.');
+            }
+
+            const user = await response.json();
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
+            window.location.href = 'index.html';
+        } catch (error) {
+            errorMessage.textContent = error.message;
+        }
+    });
+</script>
+</body>
+</html>
