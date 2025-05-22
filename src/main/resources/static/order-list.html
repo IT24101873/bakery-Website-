@@ -7,62 +7,101 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
-      background-image: url('https://images.unsplash.com/photo-1600585154347-be6161a56a0c');
-      background-size: cover;
-      background-attachment: fixed;
+      background: linear-gradient(135deg, #E6F0FA 0%, #A3BFFA 100%);
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .fade-in {
+      animation: fadeIn 1s ease-in-out;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .btn {
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 300%;
+      height: 300%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%) scale(0);
+      transition: transform 0.5s ease;
+    }
+    .btn:hover::after {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    .table-row {
+      transition: background-color 0.3s ease;
+    }
+    .table-row:hover {
+      background-color: #A3BFFA;
     }
   </style>
 </head>
-<body class="min-h-screen p-6">
-<div class="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
-  <h1 class="text-3xl font-bold text-center text-blue-600 mb-6"> Bakery Orders </h1>
-  <table class="w-full text-left border-collapse">
-    <thead>
-    <tr class="bg-blue-100">
-      <th class="p-3">Order ID</th>
-      <th class="p-3">Customer</th>
-      <th class="p-3">Item</th>
-      <th class="p-3">Pickup Time</th>
-      <th class="p-3">Status</th>
-      <th class="p-3">Details</th>
-    </tr>
-    </thead>
-    <tbody id="orderTableBody">
-    <!-- Orders will be populated dynamically -->
-    </tbody>
-  </table>
-  <div class="flex justify-between mt-6">
-    <a href="/order-form.html" class="text-blue-600 hover:underline">Place a New Order</a>
-    <a href="/admin-dashboard.html" class="text-blue-600 hover:underline">Go to Admin Dashboard</a>
+<body class="min-h-screen flex items-center justify-center">
+<div class="container mx-auto p-6 fade-in">
+  <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Bakery Orders</h1>
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    <table class="w-full table-auto border-collapse">
+      <thead>
+      <tr class="bg-blue-200 text-gray-700">
+        <th class="p-4">Order ID</th>
+        <th class="p-4">Customer</th>
+        <th class="p-4">Cake Type</th>
+        <th class="p-4">Pickup Time</th>
+        <th class="p-4">Status</th>
+        <th class="p-4">Order Type</th>
+      </tr>
+      </thead>
+      <tbody id="order-table-body">
+      <!-- Orders will be populated by JavaScript -->
+      </tbody>
+    </table>
+  </div>
+  <div class="mt-6 flex justify-center space-x-4">
+    <a href="order-form.html" class="btn bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600">Place a New Order</a>
+    <a href="admin-dashboard.html" class="btn bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600">Go to Admin Dashboard</a>
   </div>
 </div>
 <script>
-  async function loadOrders() {
-    const response = await fetch('/api/orders');
-    const orders = await response.json();
-    const tbody = document.getElementById('orderTableBody');
-    tbody.innerHTML = ''; // Clear any existing rows
-    if (orders.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="p-3 text-center text-gray-600">No orders yet. Place an order to get started!</td></tr>';
-      return;
-    }
-    orders.forEach(order => {
-      const row = document.createElement('tr');
-      row.className = 'border-b hover:bg-blue-50';
-      row.innerHTML = `
-                    <td class="p-3">${order.orderId}</td>
-                    <td class="p-3">${order.customerName}</td>
-                    <td class="p-3">${order.item}</td>
-                    <td class="p-3">${order.pickupTime}</td>
-                    <td class="p-3">${order.status}</td>
-                    <td class="p-3">${order.orderDetails}</td>
-                `;
-      tbody.appendChild(row);
+  document.addEventListener('DOMContentLoaded', () => {
+    const elements = document.querySelectorAll('.fade-in');
+    elements.forEach((el, index) => {
+      el.style.animationDelay = `${index * 0.2}s`;
     });
-  }
 
-  // Load orders when the page loads
-  window.onload = loadOrders;
+    // Fetch and display orders
+    fetch('/api/orders')
+            .then(response => response.json())
+            .then(orders => {
+              const tableBody = document.getElementById('order-table-body');
+              tableBody.innerHTML = '';
+              orders.forEach(order => {
+                const row = document.createElement('tr');
+                row.className = 'table-row text-center';
+                row.innerHTML = `
+                            <td class="p-4">${order.orderId}</td>
+                            <td class="p-4">${order.customerName}</td>
+                            <td class="p-4">${order.cakeType}</td>
+                            <td class="p-4">${new Date(order.pickupTime).toLocaleString()}</td>
+                            <td class="p-4">${order.status}</td>
+                            <td class="p-4">${order.orderType === 'CUSTOM' ? 'Custom Order' : 'Standard Order'}</td>
+                        `;
+                tableBody.appendChild(row);
+              });
+            })
+            .catch(error => console.error('Error fetching orders:', error));
+  });
 </script>
 </body>
 </html>

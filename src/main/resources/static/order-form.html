@@ -3,60 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bakery Order Form</title>
+    <title>Place Your Bakery Order</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background-image: url('https://images.unsplash.com/photo-1600585154347-be6161a56a0c');
-            background-size: cover;
-            background-attachment: fixed;
+            background: linear-gradient(135deg, #E6F0FA 0%, #A3BFFA 100%);
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .input-field {
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            border-color: #A3BFFA;
+            box-shadow: 0 0 10px rgba(163, 191, 250, 0.5);
+        }
+        .btn {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300%;
+            height: 300%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease;
+        }
+        .btn:hover::after {
+            transform: translate(-50%, -50%) scale(1);
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen">
-<div class="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg w-full max-w-md">
-    <h1 class="text-3xl font-bold text-center text-blue-600 mb-6"> Place Your Bakery Order </h1>
-    <form id="orderForm" class="space-y-4">
-        <div>
-            <label for="customerName" class="block text-sm font-medium text-gray-700">Customer Name</label>
-            <input type="text" id="customerName" name="customerName" required
-                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+<body class="min-h-screen flex items-center justify-center">
+<div class="container mx-auto p-6 fade-in">
+    <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Place Your Bakery Order</h1>
+    <form class="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto" action="/add-order" method="POST">
+        <div class="mb-4">
+            <label for="customer-name" class="block text-gray-700">Customer Name</label>
+            <input type="text" id="customer-name" name="customerName" class="input-field w-full p-3 mt-1 border rounded-lg" required>
         </div>
-        <div>
-            <label for="item" class="block text-sm font-medium text-gray-700">Item</label>
-            <input type="text" id="item" name="item" required
-                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        <div class="mb-4">
+            <label for="cake-type" class="block text-gray-700">Cake Type</label>
+            <select id="cake-type" name="cakeType" class="input-field w-full p-3 mt-1 border rounded-lg" required>
+                <option value="Wedding Cake">Wedding Cake</option>
+                <option value="Party Cake">Party Cake</option>
+                <option value="Cupcake">Cupcake</option>
+            </select>
         </div>
-        <div>
-            <label for="pickupTime" class="block text-sm font-medium text-gray-700">Pickup Time</label>
-            <input type="datetime-local" id="pickupTime" name="pickupTime" required
-                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        <div class="mb-4">
+            <label for="pickup-time" class="block text-gray-700">Pickup Time</label>
+            <input type="datetime-local" id="pickup-time" name="pickupTime" class="input-field w-full p-3 mt-1 border rounded-lg" required>
         </div>
-        <div>
-            <label for="cakeDesign" class="block text-sm font-medium text-gray-700">Cake Design (Optional)</label>
-            <input type="text" id="cakeDesign" name="cakeDesign"
-                   class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        <div class="mb-4">
+            <label for="order-type" class="block text-gray-700">Order Type</label>
+            <select id="order-type" name="orderType" class="input-field w-full p-3 mt-1 border rounded-lg" required>
+                <option value="CUSTOM">Custom Order</option>
+                <option value="STANDARD">Standard Order</option>
+            </select>
         </div>
-        <button type="submit"
-                class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
-            Place Order
-        </button>
+        <button type="submit" class="btn bg-blue-500 text-white w-full py-3 rounded-lg hover:bg-blue-600">Place Order</button>
     </form>
-    <a href="/order-list.html" class="block text-center mt-4 text-blue-600 hover:underline">View All Orders</a>
+    <div class="mt-6 text-center">
+        <a href="order-list.html" class="btn bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600">View All Orders</a>
+    </div>
 </div>
 <script>
-    document.getElementById('orderForm').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const response = await fetch('/add-order', {
-            method: 'POST',
-            body: formData
+    document.addEventListener('DOMContentLoaded', () => {
+        const elements = document.querySelectorAll('.fade-in');
+        elements.forEach((el, index) => {
+            el.style.animationDelay = `${index * 0.2}s`;
         });
-        if (response.ok) {
-            window.location.href = '/order-list.html';
-        } else {
-            alert('Failed to place order. Please try again.');
-        }
     });
 </script>
 </body>
