@@ -1,0 +1,33 @@
+[ {
+  "id" : 1,
+  "username" : "admin01",
+  "email" : "admin01",
+  "password" : "Jasmine@123",
+  "role" : "ADMIN",
+  "adminLevel" : "SUPER_ADMIN",
+  "userType" : "Admin"
+}, {
+  "id" : 2,
+  "username" : "admin02",
+  "email" : "admin02",
+  "password" : "",
+  "role" : "ADMIN",
+  "adminLevel" : "SUPER_ADMIN",
+  "userType" : "Admin"
+}, {
+  "id" : 3,
+  "username" : "admin03",
+  "email" : "admin03",
+  "password" : "admin768",
+  "role" : "ADMIN",
+  "adminLevel" : "admin03@example.com",
+  "userType" : "Admin"
+}, {
+  "id" : 4,
+  "username" : "admin04",
+  "email" : "admin04",
+  "password" : "",
+  "role" : "ADMIN",
+  "adminLevel" : "2",
+  "userType" : "Admin"
+} ]

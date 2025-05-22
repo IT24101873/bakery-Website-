@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Bakery Website</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="header">
+    <div class="container">
+        <div class="navbar">
+            <div class="logo">
+                <img src="images/images/icon.png" width="125px">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="admin-login.html">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="small-container">
+        <!-- Users Section -->
+        <div class="dashboard-section">
+            <h2 class="title">Manage Users</h2>
+            <div class="form-group">
+                <label for="user-id">Retrieve User by ID</label>
+                <input type="number" id="user-id" placeholder="Enter User ID">
+                <button class="btn" onclick="getUserById()">Retrieve</button>
+            </div>
+            <h3>All Users</h3>
+            <table class="user-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                </tr>
+                </thead>
+                <tbody id="user-table-body"></tbody>
+            </table>
+        </div>
+
+        <!-- Admins Section -->
+        <div class="dashboard-section">
+            <h2 class="title">Manage Admins</h2>
+            <div class="form-group">
+                <h3>Add New Admin</h3>
+                <form id="add-admin-form">
+                    <div class="form-group">
+                        <label for="admin-username">Username</label>
+                        <input type="text" id="admin-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-password">Password</label>
+                        <input type="password" id="admin-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-email">Email</label>
+                        <input type="email" id="admin-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-level">Admin Level</label>
+                        <select id="admin-level" required>
+                            <option value="SUPER_ADMIN">Super</option>
+                            <option value="2">Baker</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn">Add Admin</button>
+                </form>
+            </div>
+            <h3>All Admins</h3>
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Admin Level</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="admin-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <div class="container">
+        <h3>Visit Our Bakery</h3>
+        <p>Explore our delicious range of fresh baked goods, now available at your fingertips.</p>
+    </div>
+</div>
+
+<script>
+    // Load all users
+    async function loadUsers() {
+        try {
+            const response = await fetch('/api/users');
+            const users = await response.json();
+            const tableBody = document.getElementById('user-table-body');
+            tableBody.innerHTML = '';
+            users.forEach(user => {
+                const row = `<tr>
+                        <td>${user.id}</td>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                    </tr>`;
+                tableBody.innerHTML += row;
+            });
+        } catch (error) {
+            alert('Error loading users: ' + error.message);
+        }
+    }
+
+    // Load all admins
+    async function loadAdmins() {
+        try {
+            const response = await fetch('/api/admins');
+            const admins = await response.json();
+            const tableBody = document.getElementById('admin-table-body');
+            tableBody.innerHTML = '';
+            admins.forEach(admin => {
+                const levelName = admin.adminLevel === 'SUPER_ADMIN' ? 'Super' : 'Baker';
+                const isSuperAdmin = admin.username === 'admin01'; // Disable actions for admin01
+                const updateBtn = isSuperAdmin ? '<span class="action-btn update-btn" style="background: gray; cursor: not-allowed;">Update</span>' :
+                    `<a href="#" class="action-btn update-btn" onclick="openUpdateForm(${admin.id}, '${admin.username}', '${admin.email || ''}', '${admin.adminLevel}')">Update</a>`;
+                const deleteBtn = isSuperAdmin ? '<span class="action-btn delete-btn" style="background: gray; cursor: not-allowed;">Delete</span>' :
+                    `<a href="#" class="action-btn delete-btn" onclick="deleteAdmin(${admin.id})">Delete</a>`;
+
+                const row = `<tr>
+                        <td>${admin.id}</td>
+                        <td>${admin.username}</td>
+                        <td>${admin.email || 'null'}</td>
+                        <td>${levelName}</td>
+                        <td>
+                            ${updateBtn} ${deleteBtn}
+                        </td>
+                    </tr>`;
+                tableBody.innerHTML += row;
+            });
+        } catch (error) {
+            alert('Error loading admins: ' + error.message);
+        }
+    }
+
+    // Retrieve user by ID
+    async function getUserById() {
+        const userId = document.getElementById('user-id').value;
+        if (!userId) {
+            alert('Please enter a user ID');
+            return;
+        }
+        try {
+            const response = await fetch(`/api/users/${userId}`);
+            if (response.ok) {
+                const user = await response.json();
+                const tableBody = document.getElementById('user-table-body');
+                tableBody.innerHTML = `<tr>
+                        <td>${user.id}</td>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                    </tr>`;
+            } else {
+                alert('User not found');
+            }
+        } catch (error) {
+            alert('Error retrieving user: ' + error.message);
+        }
+    }
+
+    // Add new admin
+    document.getElementById('add-admin-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('admin-username').value;
+        const password = document.getElementById('admin-password').value;
+        const email = document.getElementById('admin-email').value;
+        const adminLevel = document.getElementById('admin-level').value;
+
+        try {
+            const response = await fetch('/api/admins', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, email, adminLevel })
+            });
+            if (response.ok) {
+                alert('Admin added successfully');
+                loadAdmins();
+                document.getElementById('add-admin-form').reset();
+            } else {
+                const errorData = await response.json();
+                alert('Error adding admin: ' + (errorData.message || 'Unknown error'));
+            }
+        } catch (error) {
+            alert('Error adding admin: ' + error.message);
+        }
+    });
+
+    // Open update form (creates a modal-like form)
+    function openUpdateForm(id, username, email, adminLevel) {
+        if (username === 'admin01') return; // Prevent updating admin01
+        const form = document.createElement('div');
+        form.innerHTML = `
+                <div class="form-group" style="background: #fff; padding: 20px; border-radius: 10px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <h3>Update Admin</h3>
+                    <form id="update-admin-form">
+                        <div class="form-group">
+                            <label for="update-username">Username</label>
+                            <input type="text" id="update-username" value="${username}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="update-password">Password</label>
+                            <input type="password" id="update-password" placeholder="New password (optional)">
+                        </div>
+                        <div class="form-group">
+                            <label for="update-email">Email</label>
+                            <input type="email" id="update-email" value="${email}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="update-admin-level">Admin Level</label>
+                            <select id="update-admin-level" required>
+                                <option value="SUPER_ADMIN" ${adminLevel === 'SUPER_ADMIN' ? 'selected' : ''}>Super</option>
+                                <option value="2" ${adminLevel !== 'SUPER_ADMIN' ? 'selected' : ''}>Baker</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Update</button>
+                        <button type="button" class="btn delete-btn" onclick="this.parentElement.parentElement.remove()">Cancel</button>
+                    </form>
+                </div>
+            `;
+        document.body.appendChild(form);
+        form.querySelector('#update-admin-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const updatedUsername = document.getElementById('update-username').value;
+            const updatedPassword = document.getElementById('update-password').value || ''; // Handle empty password
+            const updatedEmail = document.getElementById('update-email').value || null; // Handle null email
+            const updatedAdminLevel = document.getElementById('update-admin-level').value;
+
+            try {
+                const response = await fetch(`/api/admins/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: updatedUsername, password: updatedPassword, email: updatedEmail, adminLevel: updatedAdminLevel })
+                });
+                if (response.ok) {
+                    alert('Admin updated successfully');
+                    loadAdmins();
+                    form.remove();
+                } else {
+                    const errorData = await response.json();
+                    alert('Error updating admin: ' + (errorData.message || 'Unknown error'));
+                }
+            } catch (error) {
+                alert('Error updating admin: ' + error.message);
+            }
+        });
+    }
+
+    // Delete admin
+    async function deleteAdmin(id) {
+        const admin = (await (await fetch(`/api/admins/${id}`)).json()).username;
+        if (admin === 'admin01') {
+            alert('Cannot delete Super admin (admin01)');
+            return;
+        }
+        if (confirm('Are you sure you want to delete this admin?')) {
+            try {
+                const response = await fetch(`/api/admins/${id}`, {
+                    method: 'DELETE'
+                });
+                if (response.ok) {
+                    alert('Admin deleted successfully');
+                    loadAdmins();
+                } else {
+                    alert('Error deleting admin');
+                }
+            } catch (error) {
+                alert('Error deleting admin: ' + error.message);
+            }
+        }
+    }
+
+    // Load data on page load
+    window.onload = () => {
+        loadUsers();
+        loadAdmins();
+    };
+</script>
+</body>
+</html>

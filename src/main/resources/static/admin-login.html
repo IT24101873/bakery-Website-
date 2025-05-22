@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - Bakery Website</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="header">
+    <div class="container">
+        <div class="navbar">
+            <div class="logo">
+                <img src="images/images/icon.png" width="125px">
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="login.html">User Login</a></li>
+                    <li><a href="register.html">Register</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="small-container">
+        <h2 class="title">Admin Login</h2>
+        <div class="form-group">
+            <form id="admin-login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+            </form>
+        </div>
+        <p>Don't have an admin account? Contact a super admin to register.</p>
+    </div>
+</div>
+
+<div class="footer">
+    <div class="container">
+        <h3>Visit Our Bakery</h3>
+        <p>Explore our delicious range of fresh baked goods, now available at your fingertips.</p>
+    </div>
+</div>
+
+<script>
+    document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        try {
+            const response = await fetch('/api/admins/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (response.ok) {
+                const admin = await response.json();
+                alert('Login successful! Welcome, ' + admin.username);
+                window.location.href = 'admin-dashboard.html';
+            } else {
+                alert('Invalid username or password');
+            }
+        } catch (error) {
+            alert('Error during login: ' + error.message);
+        }
+    });
+</script>
+</body>
+</html>
