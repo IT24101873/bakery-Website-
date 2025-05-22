@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Golden Dust</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;1,700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="header">
+    <div class="container">
+        <div class="navbar">
+            <div class="logo">
+                <!-- Add your logo image path here -->
+                <img src="images/icon.png" alt="Bakery logo">
+            </div>
+            <nav class="nav-links">
+                <ul id="nav-links">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="register.html">Register</a></li>
+                    <li><a href="login.html">Login</a></li>
+                    <li><a href="admin-login.html">Admin Login</a></li>
+                </ul>
+            </nav>
+            <!-- Add your cart image path here -->
+            <img src="images/images/cartIcon.png" class="cart" width="30px" height="30px">
+        </div>
+        <div class="row">
+            <div class="col-2">
+                <h1>The Taste of Home in Every Bite</h1>
+                <p>Baking is love made edible — welcome to a world of sweet moments and fresh beginnings</p>
+                <a href="products.html" class="btn">Buy Now ➜</a>
+            </div>
+            <div class="col-2">
+                <!-- Add your front-page image path here -->
+                <img src="images/images/breadbasket.png">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Categories -->
+<div class="featured-categories"></div>
+<div class="small-container">
+    <div class="row">
+        <div class="col-2">
+            <!-- Add your custom cake image path here -->
+            <img src="images/images/customCake.png" alt="Custom Cake" style="max-width: 100%; height: auto;">
+        </div>
+        <div class="col-2" style="display: flex; flex-direction: column; justify-content: center;">
+            <h2>Design Your Own Cake</h2>
+            <p>Create the cake of your dreams! Choose your flavor, frosting, shape, and decorations. Perfect for birthdays, weddings, and special events.</p>
+            <a href="custom-cake.html" class="btn">Make Your Custom Cake</a>
+        </div>
+    </div>
+</div>
+
+<!-- Offer -->
+<div class="offer">
+    <div class="small-container">
+        <div class="row">
+            <div class="col-2">
+                <!-- Add your donut image path here -->
+                <img src="images/images/donut.png" class="offer-img">
+            </div>
+            <div class="col-2">
+                <p>Coming Soon!</p>
+                <h1>Donuts</h1>
+                <small>
+                    Coming soon to our bakery—get ready to indulge in the Caramel Pecan Dream donut!
+                    Soft, fluffy, and drizzled with rich caramel glaze, topped with crunchy toasted pecans
+                    for the perfect sweet and nutty treat. Don’t miss out!
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="footer-col-1">
+                <h3>Visit Our Bakery</h3>
+                <p>Explore our delicious range of fresh baked goods, now available at your fingertips.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = 'http://localhost:8080/api';
+
+    // Fetch products
+    fetch(`${API_BASE}/products`)
+        .then(response => response.json())
+        .then(products => {
+            const productList = document.getElementById('product-list');
+            if (productList) {
+                products.forEach(product => {
+                    const productDiv = document.createElement('div');
+                    productDiv.className = 'col-4';
+                    productDiv.innerHTML = `
+                            <!-- Add your product image path here -->
+                            <img src="" alt="${product.name}">
+                            <h4>${product.name}</h4>
+                            <p>Rs. ${product.price}</p>
+                        `;
+                    productList.appendChild(productDiv);
+                });
+            }
+        })
+        .catch(error => console.error('Error loading products:', error));
+</script>
+</body>
+</html>
