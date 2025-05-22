@@ -1,7 +1,6 @@
 package com.bakery.BakeryWebsite.repository;
 
 import com.bakery.BakeryWebsite.models.Order;
-import com.bakery.BakeryWebsite.models.CustomCakeOrder;
 
 import java.io.*;
 import java.time.LocalDateTime;
@@ -15,14 +14,8 @@ public class OrderRepository {
 
     public void saveOrder(Order order) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH, true))) {
-            String line;
-            if (order instanceof CustomCakeOrder customCakeOrder) {
-                line = order.getOrderId() + "," + order.getCustomerName() + "," + order.getItem() + "," +
-                        order.getPickupTime().format(FORMATTER) + ",CustomCake," + customCakeOrder.getCakeDesign() + "," + order.getStatus();
-            } else {
-                line = order.getOrderId() + "," + order.getCustomerName() + "," + order.getItem() + "," +
-                        order.getPickupTime().format(FORMATTER) + ",Regular,," + order.getStatus();
-            }
+            String line = order.getOrderId() + "," + order.getCustomerName() + "," + order.getCakeType() + "," +
+                    order.getPickupTime().format(FORMATTER) + "," + order.getOrderType() + "," + order.getStatus();
             writer.write(line);
             writer.newLine();
         }
@@ -38,19 +31,14 @@ public class OrderRepository {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
+                if (parts.length < 5) continue; // Skip malformed lines
                 String orderId = parts[0];
                 String customerName = parts[1];
-                String item = parts[2];
+                String cakeType = parts[2];
                 LocalDateTime pickupTime = LocalDateTime.parse(parts[3], FORMATTER);
-                String type = parts[4];
-                String cakeDesign = parts.length > 5 ? parts[5] : "";
-                String status = parts.length > 6 ? parts[6] : "PENDING";
-                Order order;
-                if ("CustomCake".equals(type)) {
-                    order = new CustomCakeOrder(orderId, customerName, item, pickupTime, cakeDesign);
-                } else {
-                    order = new Order(orderId, customerName, item, pickupTime);
-                }
+                Order.OrderType orderType = Order.OrderType.valueOf(parts[4]);
+                String status = parts.length > 5 ? parts[5] : "PENDING";
+                Order order = new Order(orderId, customerName, cakeType, pickupTime, orderType);
                 order.setStatus(Order.Status.valueOf(status));
                 orders.add(order);
             }
@@ -70,14 +58,8 @@ public class OrderRepository {
         }
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
             for (Order order : updatedOrders) {
-                String line;
-                if (order instanceof CustomCakeOrder customCakeOrder) {
-                    line = order.getOrderId() + "," + order.getCustomerName() + "," + order.getItem() + "," +
-                            order.getPickupTime().format(FORMATTER) + ",CustomCake," + customCakeOrder.getCakeDesign() + "," + order.getStatus();
-                } else {
-                    line = order.getOrderId() + "," + order.getCustomerName() + "," + order.getItem() + "," +
-                            order.getPickupTime().format(FORMATTER) + ",Regular,," + order.getStatus();
-                }
+                String line = order.getOrderId() + "," + order.getCustomerName() + "," + order.getCakeType() + "," +
+                        order.getPickupTime().format(FORMATTER) + "," + order.getOrderType() + "," + order.getStatus();
                 writer.write(line);
                 writer.newLine();
             }
@@ -89,14 +71,8 @@ public class OrderRepository {
         orders.removeIf(order -> order.getOrderId().equals(orderId));
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
             for (Order order : orders) {
-                String line;
-                if (order instanceof CustomCakeOrder customCakeOrder) {
-                    line = order.getOrderId() + "," + order.getCustomerName() + "," + order.getItem() + "," +
-                            order.getPickupTime().format(FORMATTER) + ",CustomCake," + customCakeOrder.getCakeDesign() + "," + order.getStatus();
-                } else {
-                    line = order.getOrderId() + "," + order.getCustomerName() + "," + order.getItem() + "," +
-                            order.getPickupTime().format(FORMATTER) + ",Regular,," + order.getStatus();
-                }
+                String line = order.getOrderId() + "," + order.getCustomerName() + "," + order.getCakeType() + "," +
+                        order.getPickupTime().format(FORMATTER) + "," + order.getOrderType() + "," + order.getStatus();
                 writer.write(line);
                 writer.newLine();
             }
